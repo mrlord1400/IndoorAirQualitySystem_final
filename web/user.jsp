@@ -9,7 +9,14 @@
     </head>
     <body class="bg-light">
 
+
         <div class="container mt-5">
+            <div class="mb-3">
+                <a href="MainController?action=Dashboard" class="btn btn-secondary text-white shadow-sm">
+                    &larr; Quay lại Dashboard
+                </a>
+            </div>
+            
             <h2 class="text-center mb-4">Hệ Thống Quản Lý Người Dùng</h2>
 
             <%
