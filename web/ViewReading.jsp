@@ -5,7 +5,7 @@
     // Lấy dữ liệu từ request
     List<ReadingDTO> readingsList = (List<ReadingDTO>) request.getAttribute("READINGS_LIST");
 
-    // Lấy các tham số phân trang và tìm kiếm
+    // Lấy các tham số phân trang và tìm kiếm (để giữ trạng thái cho các ô input và link)
     Integer totalPages = (request.getAttribute("TOTAL_PAGES") != null) ? (Integer) request.getAttribute("TOTAL_PAGES") : 0;
     Integer currentPage = (request.getAttribute("CURRENT_PAGE") != null) ? (Integer) request.getAttribute("CURRENT_PAGE") : 1;
 
@@ -23,9 +23,7 @@
         <meta charset="UTF-8">
         <title>Truy vấn lịch sử chất lượng không khí | Lab Care</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
         <style>
-            /* GIỮ NGUYÊN CẤU TRÚC CSS BAN ĐẦU */
             body {
                 background-color: #f1f3f5;
             }
@@ -77,17 +75,13 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    <a href="MainController?action=Dashboard" class="btn btn-dark shadow-sm px-4">
-                        <i class="bi bi-speedometer2"></i> ← Quay lại Dashboard
+                    <a href="ReadingController?action=list" class="btn btn-primary shadow-sm px-4">
+                        <i class="bi bi-arrow-clockwise"></i> Làm mới dữ liệu
                     </a>
 
-                    <a href="ReadingController?action=clear" class="btn btn-outline-danger shadow-sm px-4" 
-                       onclick="return confirm('Bạn có chắc chắn muốn xóa sạch lịch sử để làm mới dữ liệu?');">
-                        <i class="bi bi-trash"></i> Xóa lịch sử
-                    </a>
-
+                    <%-- Truyền tham số lọc vào link Export để export đúng dữ liệu đang xem --%>
                     <a href="ExportController?action=exportCSV<%= searchParams%>" class="btn btn-outline-dark shadow-sm px-4">
-                        <i class="bi bi-download"></i> Xuất CSV
+                        <i class="bi bi-download"></i> Xuất file CSV
                     </a>
                 </div>
             </div>
@@ -178,19 +172,28 @@
                     </table>
                 </div>
 
+                <%-- Phân trang --%>
                 <% if (totalPages > 1) {%>
                 <nav class="d-flex justify-content-center py-4 border-top">
                     <ul class="pagination mb-0">
                         <li class="page-item <%= (currentPage == 1) ? "disabled" : ""%>">
-                            <a class="page-link" href="ReadingController?action=list&page=<%= currentPage - 1%><%= searchParams%>">Trước</a>
+                            <a class="page-link" href="ReadingController?action=list&page=<%= currentPage - 1%><%= searchParams%>">
+                                Trước
+                            </a>
                         </li>
+
                         <% for (int i = 1; i <= totalPages; i++) {%>
                         <li class="page-item <%= (i == currentPage) ? "active" : ""%>">
-                            <a class="page-link" href="ReadingController?action=list&page=<%= i%><%= searchParams%>"><%= i%></a>
+                            <a class="page-link" href="ReadingController?action=list&page=<%= i%><%= searchParams%>">
+                                <%= i%>
+                            </a>
                         </li>
                         <% }%>
+
                         <li class="page-item <%= (currentPage.equals(totalPages)) ? "disabled" : ""%>">
-                            <a class="page-link" href="ReadingController?action=list&page=<%= currentPage + 1%><%= searchParams%>">Sau</a>
+                            <a class="page-link" href="ReadingController?action=list&page=<%= currentPage + 1%><%= searchParams%>">
+                                Sau
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -199,23 +202,6 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-                           const autoRefreshInterval = 5000;
-                           function startAutoRefresh() {
-                               setInterval(function () {
-                                   const activeElement = document.activeElement;
-                                   const isTyping = activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT';
-                                   const fromDate = document.querySelector('input[name="fromDate"]').value;
-                                   const toDate = document.querySelector('input[name="toDate"]').value;
-                                   const isViewingHistory = fromDate !== "" || toDate !== "";
 
-                                   // Chỉ reload khi không bận nhập liệu hoặc xem lịch sử quá khứ
-                                   if (!isTyping && !isViewingHistory) {
-                                       window.location.reload();
-                                   }
-                               }, autoRefreshInterval);
-                           }
-                           document.addEventListener('DOMContentLoaded', startAutoRefresh);
-        </script>
     </body>
 </html>
