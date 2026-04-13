@@ -201,4 +201,46 @@ public class SensorDAO {
         }
         return list;
     }
+
+    public boolean deleteSensor(int sensorID) {
+        String sqlMap = "DELETE FROM SensorPollutantMap WHERE sensor_id = ?";
+        String sqlSensor = "DELETE FROM Sensor WHERE sensor_id = ?";
+
+        try ( Connection conn = DBUtils.getConnection()) {
+            conn.setAutoCommit(false); // Bắt đầu giao dịch
+            try ( PreparedStatement ps1 = conn.prepareStatement(sqlMap);  PreparedStatement ps2 = conn.prepareStatement(sqlSensor)) {
+
+                ps1.setInt(1, sensorID);
+                ps1.executeUpdate();
+
+                ps2.setInt(1, sensorID);
+                int rows = ps2.executeUpdate();
+
+                conn.commit(); // Lưu thay đổi
+                return rows > 0;
+            } catch (Exception e) {
+                conn.rollback(); // Lỗi thì quay lại
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isSensorActive(int sensorID) {
+        String sql = "SELECT status FROM Sensor WHERE sensor_id = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sensorID);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("status");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
