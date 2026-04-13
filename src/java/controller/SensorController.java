@@ -65,6 +65,20 @@ public class SensorController extends HttpServlet {
                 response.getWriter().flush();
                 return; // THOÁT HÀM ngay để tránh finally forward JSON sang JSP
 
+            } else if ("toggle".equals(subAction)) {
+                int sensorID = Integer.parseInt(request.getParameter("sensorID"));
+                boolean currentStatus = Boolean.parseBoolean(request.getParameter("status"));
+                // Đảo trạng thái: true -> false, false -> true
+                dao.updateSensorStatus(sensorID, !currentStatus);
+                response.sendRedirect("MainController?action=Sensor&msg=StatusUpdated");
+                return;
+
+            } else if ("delete".equals(subAction)) {
+                int sensorID = Integer.parseInt(request.getParameter("sensorID"));
+                if (dao.deleteSensor(sensorID)) {
+                    response.sendRedirect("MainController?action=Sensor&msg=DeleteSuccess");
+                    return;
+                }
             } else {
                 // MẶC ĐỊNH: Luôn load danh sách đầy đủ (Dùng bản JOIN để lấy được cả csvIndex nếu cần)
                 request.setAttribute("SENSOR_LIST", dao.getAllSensors(conn));
